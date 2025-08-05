@@ -1,18 +1,14 @@
 <div align="center">
 
-# 🌐 git-me-ai
+# ⚙️ git-me-ai
 
-A modern web application built with TypeScript. No description provided.
+A scalable backend service. No description provided.
 
 [![GitHub stars](https://img.shields.io/github/stars/{github_user}/{repo_name})](https://github.com/{github_user}/{repo_name}/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/{github_user}/{repo_name})](https://github.com/{github_user}/{repo_name}/network)
 [![GitHub issues](https://img.shields.io/github/issues/{github_user}/{repo_name})](https://github.com/{github_user}/{repo_name}/issues)
 [![GitHub license](https://img.shields.io/github/license/{github_user}/{repo_name})](https://github.com/{github_user}/{repo_name}/blob/main/LICENSE)
 
-
-![Project Preview](https://via.placeholder.com/800x400/667eea/ffffff?text=Add+Your+Project+Screenshot+Here)
-
-> 🎯 **Live Demo:** [View Demo](https://your-demo-url.com) | 📖 **Documentation:** [Read Docs](https://your-docs-url.com)
 
 
 </div>
@@ -35,15 +31,15 @@ A modern web application built with TypeScript. No description provided.
 
 ## ✨ Features
 
-- 🌐 Modern web interface
-- 📱 Responsive design
-- ⚡ Fast performance
+- 🚀 Core functionality
+- ⚡ High performance
 
 ## 🛠️ Technologies
 
 ### Programming Languages
 
-- **TypeScript** (100.0%)
+- **Python** (95.9%)
+- **TypeScript** (4.1%)
 
 
 ## 🚀 Quick Start
@@ -61,10 +57,15 @@ cd git-me-ai
 ## 📁 Project Structure
 
 ```
+📁 backend/
+│   ├── 🐳 DockerFile
+│   ├── 🐍 main.py
 📁 frontend/
 │   ├── 📁 vite-project/
 │   │   ├── 📁 src/
 │   │   │   ├── ⚡ main.tsx
+│   │   ├── ⚡ vite.config.ts
+📝 README.md
 ```
 
 Structure details available in the file tree above.
@@ -73,6 +74,7 @@ Structure details available in the file tree above.
 
 ### Prerequisites
 
+- Python 3.8+ installed
 - Node.js 16+ and npm
 
 ### Installation Steps
@@ -83,24 +85,24 @@ Structure details available in the file tree above.
    cd git-me-ai
    ```
 
-2. **Install dependencies**
+2. **Set up Python environment**
    ```bash
+   # Create virtual environment
+   python -m venv venv
+
+   # Activate virtual environment
+   # On Windows:
+   venv\Scripts\activate
+   # On macOS/Linux:
+   source venv/bin/activate
+
+   # Install dependencies
    ```
 
 
 ## 🎯 Usage
 
-### Using the Application
-
-1. 🌐 Open your browser and navigate to `http://localhost:3000`
-2. 📝 Create an account or sign in
-3. 🚀 Start using the features!
-
-### Available Routes
-
-- `/` - Home page
-- `/dashboard` - User dashboard
-- `/settings` - Configuration
+Detailed usage instructions coming soon...
 
 ## 🔧 Configuration
 
@@ -119,25 +121,7 @@ echo "No tests yet"
 
 ## 🚢 Deployment
 
-### 🌐 Web Deployment
-
-#### Vercel
-```bash
-npm install -g vercel
-vercel --prod
-```
-
-#### Netlify
-```bash
-npm run build
-# Upload dist/ folder to Netlify
-```
-
-#### Heroku
-```bash
-git push heroku main
-```
-
+Deployment instructions will be added based on your hosting preferences.
 
 ## 🤝 Contributing
 
