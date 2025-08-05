@@ -2,7 +2,7 @@
 
 # ⚙️ git-me-ai
 
-A scalable backend service. No description provided.
+A scalable Python backend service with a TypeScript frontend. It's purpose is currently not well-defined in the repository.
 
 [![GitHub stars](https://img.shields.io/github/stars/{github_user}/{repo_name})](https://github.com/{github_user}/{repo_name}/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/{github_user}/{repo_name})](https://github.com/{github_user}/{repo_name}/network)
