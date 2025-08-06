@@ -16,21 +16,27 @@ import {
   CardContent,
   Divider,
   IconButton,
-  Snackbar
+  Snackbar,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { apiService, type ReadmeResponse, type User } from '../services/api';
+import ReadmeLivePreview from '../components/ReadmeLivePreview';
 
 const ReadmeGenerator: React.FC = () => {
   const navigate = useNavigate();
   const { repoName } = useParams<{ repoName: string }>();
   const [user, setUser] = useState<User | null>(null);
   const [readmeData, setReadmeData] = useState<ReadmeResponse | null>(null);
+  const [currentReadmeContent, setCurrentReadmeContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [committing, setCommitting] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
   const [commitSuccess, setCommitSuccess] = useState(false);
+  const [viewMode, setViewMode] = useState<'traditional' | 'live-preview'>('traditional');
 
   useEffect(() => {
     if (!apiService.isAuthenticated()) {
@@ -60,6 +66,7 @@ const ReadmeGenerator: React.FC = () => {
 
         setUser(userInfo);
         setReadmeData(readmeResponse);
+        setCurrentReadmeContent(readmeResponse.readme_content);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to generate README');
       } finally {
@@ -70,11 +77,35 @@ const ReadmeGenerator: React.FC = () => {
     loadData();
   }, [navigate, repoName]);
 
+  const handleRegenerate = async () => {
+    if (!repoName) return;
+    
+    try {
+      setRegenerating(true);
+      setError(null);
+
+      const fullName = repoName.replace('--', '/');
+      const repoDisplayName = fullName.split('/')[1];
+
+      const readmeResponse = await apiService.generateReadme(repoDisplayName, fullName);
+      setReadmeData(readmeResponse);
+      setCurrentReadmeContent(readmeResponse.readme_content);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to regenerate README');
+    } finally {
+      setRegenerating(false);
+    }
+  };
+
+  const handleContentChange = (newContent: string) => {
+    setCurrentReadmeContent(newContent);
+  };
+
   const handleCopyToClipboard = async () => {
-    if (!readmeData) return;
+    if (!currentReadmeContent) return;
 
     try {
-      await apiService.copyToClipboard(readmeData.readme_content);
+      await apiService.copyToClipboard(currentReadmeContent);
       setCopySuccess(true);
     } catch (error) {
       console.error('Failed to copy to clipboard:', error);
@@ -82,14 +113,14 @@ const ReadmeGenerator: React.FC = () => {
   };
 
   const handleDownload = () => {
-    if (!readmeData) return;
+    if (!readmeData || !currentReadmeContent) return;
     
     const fileName = `${readmeData.repo_analysis.name}-README.md`;
-    apiService.downloadReadme(readmeData.readme_content, fileName);
+    apiService.downloadReadme(currentReadmeContent, fileName);
   };
 
   const handleCommitToRepo = async () => {
-    if (!readmeData) return;
+    if (!readmeData || !currentReadmeContent) return;
 
     try {
       setCommitting(true);
@@ -99,7 +130,7 @@ const ReadmeGenerator: React.FC = () => {
       const fullName = repoName!.replace('--', '/');
       const repoDisplayName = fullName.split('/')[1];
       
-      await apiService.commitReadmeToRepo(repoDisplayName, fullName, readmeData.readme_content);
+      await apiService.commitReadmeToRepo(repoDisplayName, fullName, currentReadmeContent);
       setCommitSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to commit README to repository');
@@ -317,43 +348,79 @@ const ReadmeGenerator: React.FC = () => {
               </Button>
             </Stack>
 
-            {/* README Preview */}
-            <Paper sx={{ p: 3 }}>
-              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-                <Typography variant="h6" fontWeight="bold">
-                  📄 Generated README.md
-                </Typography>
-                <Stack direction="row" spacing={1}>
-                  <IconButton onClick={handleCopyToClipboard} title="Copy to clipboard">
-                    📋
-                  </IconButton>
-                  <IconButton onClick={handleDownload} title="Download">
-                    💾
-                  </IconButton>
-                </Stack>
-              </Stack>
-              
-              <Divider sx={{ mb: 3 }} />
-              
-              <Box
-                component="pre"
-                sx={{
-                  fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
-                  fontSize: '14px',
-                  lineHeight: 1.6,
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-word',
-                  backgroundColor: '#f8f9fa',
-                  padding: 3,
-                  borderRadius: 1,
-                  border: '1px solid #e9ecef',
-                  maxHeight: '600px',
-                  overflow: 'auto'
+            {/* View Mode Toggle */}
+            <Box sx={{ mb: 3 }}>
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={(_, newMode) => {
+                  if (newMode !== null) {
+                    setViewMode(newMode);
+                  }
                 }}
+                aria-label="view mode"
               >
-                {readmeData.readme_content}
+                <ToggleButton value="traditional" aria-label="traditional view">
+                  📄 Traditional View
+                </ToggleButton>
+                <ToggleButton value="live-preview" aria-label="live preview">
+                  📝 Live Preview Editor
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+
+            {/* Conditional Content Based on View Mode */}
+            {viewMode === 'traditional' ? (
+              /* Traditional README Preview */
+              <Paper sx={{ p: 3 }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
+                  <Typography variant="h6" fontWeight="bold">
+                    📄 Generated README.md
+                  </Typography>
+                  <Stack direction="row" spacing={1}>
+                    <IconButton onClick={handleCopyToClipboard} title="Copy to clipboard">
+                      📋
+                    </IconButton>
+                    <IconButton onClick={handleDownload} title="Download">
+                      💾
+                    </IconButton>
+                  </Stack>
+                </Stack>
+                
+                <Divider sx={{ mb: 3 }} />
+                
+                <Box
+                  component="pre"
+                  sx={{
+                    fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
+                    fontSize: '14px',
+                    lineHeight: 1.6,
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    backgroundColor: '#f8f9fa',
+                    padding: 3,
+                    borderRadius: 1,
+                    border: '1px solid #e9ecef',
+                    maxHeight: '600px',
+                    overflow: 'auto'
+                  }}
+                >
+                  {currentReadmeContent}
+                </Box>
+              </Paper>
+            ) : (
+              /* Live Preview Editor */
+              <Box sx={{ height: '70vh', border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                <ReadmeLivePreview
+                  readmeContent={currentReadmeContent}
+                  isGenerating={regenerating}
+                  onRegenerate={handleRegenerate}
+                  onContentChange={handleContentChange}
+                  repoName={readmeData.repo_analysis.name}
+                  isEditable={true}
+                />
               </Box>
-            </Paper>
+            )}
           </>
         )}
 
