@@ -1307,15 +1307,15 @@ Made with ❤️ by [Your Name](https://github.com/{{{{github_user}}}})
 
 ```bash
 # Example API calls
-curl -X GET "http://localhost:8000/api/endpoint"
-curl -X POST "http://localhost:8000/api/data" -H "Content-Type: application/json" -d '{"key": "value"}'
+curl -X GET "https://api.yourdomain.com/api/endpoint"
+curl -X POST "https://api.yourdomain.com/api/data" -H "Content-Type: application/json" -d '{"key": "value"}'
 ```
 
 ### Authentication
 
 ```bash
 # Get authentication token
-curl -X POST "http://localhost:8000/auth/login" -d '{"username": "user", "password": "pass"}'
+curl -X POST "https://api.yourdomain.com/auth/login" -d '{"username": "user", "password": "pass"}'
 ```""",
             'cli': """### Command Line Usage
 
