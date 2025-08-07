@@ -1,8 +1,8 @@
 <div align="center">
 
-# ⚙️ git-me-ai
+# 🐳 git-me-ai
 
-A scalable Python backend service with a TypeScript frontend. It's purpose is currently not well-defined in the repository.
+A scalable microservice with a Python backend and TypeScript frontend. Its purpose is currently not well-defined in the repository.
 
 [![GitHub stars](https://img.shields.io/github/stars/{github_user}/{repo_name})](https://github.com/{github_user}/{repo_name}/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/{github_user}/{repo_name})](https://github.com/{github_user}/{repo_name}/network)
@@ -38,9 +38,15 @@ A scalable Python backend service with a TypeScript frontend. It's purpose is cu
 
 ### Programming Languages
 
-- **Python** (95.9%)
-- **TypeScript** (4.1%)
+- **TypeScript** (49.9%)
+- **Python** (48.3%)
+- **CSS** (1.0%)
+- **JavaScript** (0.4%)
+- **Dockerfile** (0.3%)
 
+### Tools & Utilities
+
+- 🐳 Docker
 
 ## 🚀 Quick Start
 
@@ -59,16 +65,39 @@ cd git-me-ai
 ```
 📁 backend/
 │   ├── 🐳 DockerFile
+│   ├── 🐍 ai_agent.py
 │   ├── 🐍 main.py
+│   ├── 📝 requirements.txt
 📁 frontend/
 │   ├── 📁 vite-project/
 │   │   ├── 📁 src/
+│   │   │   ├── 📁 components/
+│   │   │   ├── 📁 pages/
+│   │   │   ├── 📁 services/
+│   │   │   ├── 🎨 App.css
+│   │   │   ├── ⚡ App.tsx
+│   │   │   ├── 🎨 index.css
 │   │   │   ├── ⚡ main.tsx
+│   │   │   ├── ⚡ vite-env.d.ts
+│   │   ├── 🐳 Dockerfile
+│   │   ├── ⚡ eslint.config.js
+│   │   ├── 🌐 index.html
+│   │   ├── 📄 nginx.conf
+│   │   ├── ⚙️ package-lock.json
+│   │   ├── ⚙️ package.json
+│   │   ├── ⚙️ tsconfig.app.json
+│   │   ├── ⚙️ tsconfig.json
+│   │   ├── ⚙️ tsconfig.node.json
+│   │   ├── ⚙️ vercel.json
 │   │   ├── ⚡ vite.config.ts
+│   ├── ⚙️ package-lock.json
+│   ├── ⚙️ package.json
+📄 .gitignore
 📝 README.md
+⚙️ docker-compose.yml
 ```
 
-Structure details available in the file tree above.
+- `config/` - Configuration files and environment settings
 
 ## ⚙️ Installation
 
@@ -106,7 +135,22 @@ Detailed usage instructions coming soon...
 
 ## 🔧 Configuration
 
-No special configuration required - the application works out of the box!
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+# Example configuration
+PORT=3000
+NODE_ENV=development
+DATABASE_URL=your_database_url
+API_KEY=your_api_key
+```
+
+### Available Configuration Files
+
+- `docker-compose.yml`
+
 
 ## 📖 API Documentation
 
@@ -121,7 +165,23 @@ echo "No tests yet"
 
 ## 🚢 Deployment
 
-Deployment instructions will be added based on your hosting preferences.
+### 🐳 Docker Deployment
+
+```bash
+# Build the image
+docker build -t git-me-ai .
+
+# Run the container
+docker run -p 3000:3000 git-me-ai
+```
+
+### 🐳 Docker Compose
+
+```bash
+docker-compose up -d
+```
+
+
 
 ## 🤝 Contributing
 
