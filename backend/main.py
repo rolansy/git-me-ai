@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Request, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -16,16 +16,43 @@ load_dotenv()
 
 app = FastAPI(title="Git-Me-AI Backend", version="1.0.0")
 
+# Request logging middleware
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    print(f"📥 {request.method} {request.url}")
+    print(f"🔗 Origin: {request.headers.get('origin', 'None')}")
+    print(f"📋 Headers: {dict(request.headers)}")
+    
+    response = await call_next(request)
+    
+    print(f"📤 Response status: {response.status_code}")
+    return response
+
 # Security
 security = HTTPBearer()
 
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:5173"],  # Add your frontend URLs
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://localhost:5173", 
+        "http://127.0.0.1:5173",
+        "https://git-me-ai.vercel.app"
+    ],  # Add your frontend URLs
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=[
+        "Accept",
+        "Accept-Language",
+        "Content-Language",
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+        "Origin",
+        "Access-Control-Request-Method",
+        "Access-Control-Request-Headers",
+    ],
 )
 
 # Environment variables
@@ -106,55 +133,81 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
 async def root():
     return {"message": "Git-Me-AI Backend is running!"}
 
+# Explicit OPTIONS handler for auth/github endpoint
+@app.options("/auth/github")
+async def options_auth_github():
+    """Handle CORS preflight for auth endpoint"""
+    return {"message": "OK"}
+
 @app.post("/auth/github", response_model=TokenResponse)
 async def github_oauth_callback(request: GitHubLoginRequest):
     """
     Exchange GitHub OAuth code for access token
     """
-    async with httpx.AsyncClient() as client:
-        # Exchange code for GitHub access token
-        token_response = await client.post(
-            "https://github.com/login/oauth/access_token",
-            data={
-                "client_id": GITHUB_CLIENT_ID,
-                "client_secret": GITHUB_CLIENT_SECRET,
-                "code": request.code,
-            },
-            headers={"Accept": "application/json"},
-        )
-        
-        if token_response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Failed to exchange code for token")
-        
-        token_data = token_response.json()
-        github_access_token = token_data.get("access_token")
-        
-        if not github_access_token:
-            raise HTTPException(status_code=400, detail="No access token received")
-        
-        # Get user info from GitHub
-        user_response = await client.get(
-            "https://api.github.com/user",
-            headers={"Authorization": f"Bearer {github_access_token}"},
-        )
-        
-        if user_response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Failed to get user info")
-        
-        user_data = user_response.json()
-        
-        # Create JWT token with GitHub access token embedded
-        access_token_expires = timedelta(hours=24)
-        access_token = create_access_token(
-            data={
-                "sub": user_data["login"],
-                "github_token": github_access_token,
-                "user_id": user_data["id"],
-            },
-            expires_delta=access_token_expires,
-        )
-        
-        return TokenResponse(access_token=access_token)
+    print(f"🔐 GitHub OAuth callback received with code: {request.code[:10]}...")
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            # Exchange code for GitHub access token
+            print("📞 Calling GitHub token exchange API...")
+            token_response = await client.post(
+                "https://github.com/login/oauth/access_token",
+                data={
+                    "client_id": GITHUB_CLIENT_ID,
+                    "client_secret": GITHUB_CLIENT_SECRET,
+                    "code": request.code,
+                },
+                headers={"Accept": "application/json"},
+            )
+            
+            print(f"🔄 GitHub token response status: {token_response.status_code}")
+            
+            if token_response.status_code != 200:
+                print(f"❌ Token exchange failed: {token_response.text}")
+                raise HTTPException(status_code=400, detail="Failed to exchange code for token")
+            
+            token_data = token_response.json()
+            github_access_token = token_data.get("access_token")
+            
+            if not github_access_token:
+                print(f"❌ No access token in response: {token_data}")
+                raise HTTPException(status_code=400, detail="No access token received")
+            
+            print("✅ GitHub access token received successfully")
+            
+            # Get user info from GitHub
+            print("👤 Fetching user info from GitHub...")
+            user_response = await client.get(
+                "https://api.github.com/user",
+                headers={"Authorization": f"Bearer {github_access_token}"},
+            )
+            
+            if user_response.status_code != 200:
+                print(f"❌ User info fetch failed: {user_response.text}")
+                raise HTTPException(status_code=400, detail="Failed to get user info")
+            
+            user_data = user_response.json()
+            print(f"✅ User info received for: {user_data.get('login', 'Unknown')}")
+            
+            # Create JWT token with GitHub access token embedded
+            access_token_expires = timedelta(hours=24)
+            access_token = create_access_token(
+                data={
+                    "sub": user_data["login"],
+                    "github_token": github_access_token,
+                    "user_id": user_data["id"],
+                },
+                expires_delta=access_token_expires,
+            )
+            
+            print("🎫 JWT token created successfully")
+            return TokenResponse(access_token=access_token)
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"💥 Unexpected error in GitHub OAuth: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @app.get("/repos", response_model=List[Repository])
 async def get_user_repositories(current_user: dict = Depends(verify_token)):
