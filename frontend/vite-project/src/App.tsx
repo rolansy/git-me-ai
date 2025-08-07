@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ReadmeGenerator from './pages/ReadmeGenerator';
+import BackendWakeup from './components/BackendWakeup';
 import { apiService } from './services/api';
 
 // Create a custom theme
@@ -73,9 +74,29 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 function App() {
+  const [backendReady, setBackendReady] = useState(false);
+
+  useEffect(() => {
+    // Check if we're in production (Vercel)
+    const isProduction = window.location.hostname !== 'localhost';
+    
+    if (isProduction) {
+      // Only show wakeup in production
+      setBackendReady(false);
+    } else {
+      // Skip wakeup in local development
+      setBackendReady(true);
+    }
+  }, []);
+
+  const handleBackendReady = () => {
+    setBackendReady(true);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      {!backendReady && <BackendWakeup onReady={handleBackendReady} />}
       <Router>
         <div className="App">
           <Routes>
