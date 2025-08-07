@@ -1,0 +1,134 @@
+# Python Backend
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+backend/.env
+backend/.venv
+backend/build/
+backend/dist/
+
+# Frontend Node.js
+frontend/node_modules/
+frontend/vite-project/node_modules/
+frontend/vite-project/dist/
+frontend/vite-project/build/
+frontend/vite-project/.vite/
+frontend/vite-project/.cache/
+frontend/vite-project/.temp/
+frontend/vite-project/.tmp/
+
+# Frontend Environment files
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/vite-project/.env
+frontend/vite-project/.env.local
+frontend/vite-project/.env.development.local
+frontend/vite-project/.env.test.local
+frontend/vite-project/.env.production.local
+
+# Frontend Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+frontend/vite-project/npm-debug.log*
+frontend/vite-project/yarn-debug.log*
+frontend/vite-project/yarn-error.log*
+frontend/vite-project/pnpm-debug.log*
+frontend/vite-project/lerna-debug.log*
+
+# Frontend Build outputs
+frontend/dist-ssr/
+frontend/coverage/
+frontend/vite-project/dist-ssr/
+frontend/vite-project/coverage/
+
+# Vercel
+.vercel
+
+# Frontend TypeScript
+frontend/*.tsbuildinfo
+frontend/vite-project/*.tsbuildinfo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary folders
+tmp/
+temp/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
